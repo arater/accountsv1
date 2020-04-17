@@ -4,11 +4,14 @@ import { Route, Switch } from 'react-router-dom'
 import routes from './routes'
 import Navbar from './Navbar'
 import NoMatch from './NoMatch'
-import Counter from '../components/counter';
+import {ViewCounter} from '../components/ViewCounter';
+import { viewModelCounter } from '../viewModels/viewModelCounter'
 
+const viewModel = new viewModelCounter();
 const App = props => (
+  
   <>
-    <Counter />
+    <ViewCounter viewModel={viewModel} />
 
     <Navbar />
 
