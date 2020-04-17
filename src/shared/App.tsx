@@ -1,13 +1,16 @@
 import React from 'react'
 import { Route, Switch } from 'react-router-dom'
+import { ApolloProvider } from '@apollo/react-hooks';
 
 import routes from './routes'
 import Navbar from './Navbar'
 import NoMatch from './NoMatch'
 import Counter from '../components/counter';
+import apolloClient from './apollo/apolloSetup';
 
 const App = props => (
-  <>
+  <ApolloProvider client={apolloClient}>
+    <>
     <Counter />
 
     <Navbar />
@@ -19,6 +22,8 @@ const App = props => (
       <Route render={props => <NoMatch {...props} />} />
     </Switch>
   </>
+  </ApolloProvider>
+  
 )
 
 export default App;
