@@ -1,13 +1,22 @@
-import { HttpLink } from 'apollo-link-http';
-import { ApolloClient } from 'apollo-client';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import ApolloClient from "apollo-boost";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { CounterMutations } from "../../mutations";
 
-// link of server 
-const httpLink = new HttpLink({
-    uri: 'http://localhost:81'
+const cache = new InMemoryCache();
+
+const client = new ApolloClient({
+  cache,
+  resolvers: {
+    Mutation: {
+      ...CounterMutations
+    }
+  }
 });
 
-export default new ApolloClient({
-    cache: new InMemoryCache(),
-    link: httpLink
-});
+const initialState = { 
+  counter: 0,
+  ratio: 3
+ };
+cache.writeData({ data: initialState });
+
+export default client;

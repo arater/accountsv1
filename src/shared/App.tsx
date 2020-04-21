@@ -6,10 +6,10 @@ import routes from './routes'
 import Navbar from './Navbar'
 import NoMatch from './NoMatch'
 import Counter from '../components/counter';
-import apolloClient from './apollo/apolloSetup';
+import client from './apollo/apolloSetup';
 
 const App = props => (
-  <ApolloProvider client={apolloClient}>
+  <ApolloProvider client={client}>
     <>
     <Counter />
 
