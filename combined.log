@@ -145,3 +145,17 @@
 {"message":"\"warning log\"","level":"warn","timestamp":"6/4/2020, 15:04:06"}
 {"message":"\"info log\"","level":"info","timestamp":"6/4/2020, 15:04:06"}
 {"message":"\"error log\"","level":"error","timestamp":"6/4/2020, 15:04:06"}
+{"message":"\"warning log\"","level":"warn","timestamp":"6/4/2020, 15:06:02"}
+{"message":"\"info log\"","level":"info","timestamp":"6/4/2020, 15:06:02"}
+{"message":"\"error log\"","level":"error","timestamp":"6/4/2020, 15:06:02"}
+{"message":"\"warning log\"","level":"warn","timestamp":"6/4/2020, 15:06:06"}
+{"message":"\"info log\"","level":"info","timestamp":"6/4/2020, 15:06:06"}
+{"message":"\"error log\"","level":"error","timestamp":"6/4/2020, 15:06:06"}
+{"message":"\"warning log\"","level":"warn","timestamp":"6/4/2020, 15:08:02"}
+{"message":"\"info log\"","level":"info","timestamp":"6/4/2020, 15:08:02"}
+{"message":"\"error log\"","level":"error","timestamp":"6/4/2020, 15:08:02"}
+{"message":"\"error log from boundary\"","level":"error","timestamp":"6/4/2020, 15:08:06"}
+{"message":"\"error log from boundary\"","level":"error","timestamp":"6/4/2020, 15:08:06"}
+{"message":"\"warning log\"","level":"warn","timestamp":"6/4/2020, 15:08:06"}
+{"message":"\"info log\"","level":"info","timestamp":"6/4/2020, 15:10:02"}
+{"message":"\"warning log\"","level":"warn","timestamp":"6/4/2020, 15:10:02"}
