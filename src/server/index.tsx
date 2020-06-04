@@ -17,11 +17,8 @@ import routes from '../shared/routes'
 const app: Application = express()
 // Config file variables 
 const dotenv = require('dotenv').config()
-console.log('Dotenv file', dotenv)
 const port = process.env.PORT || 8180
 const isProd = process.env.NODE_ENV === 'production'
-//console.log('isProd',isProd)
-//console.log('BUILD', process.env.BUILD)
 const publicPath = path.join(__dirname, 'public')
 const server = http.createServer(app)
 const fs = require('fs');
@@ -67,7 +64,6 @@ console.log('daily log file', dailyLogFileName)
 //Creating new daily log files if it is not exist
 fs.writeFile(`./log/${dailyLogFileName}.log`, '', function (err) {
   if (err) throw err;
-  console.log('Saved!');
 });
 
 const { combine, timestamp, align, json } = winston.format;
