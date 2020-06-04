@@ -1,0 +1,9 @@
+{"message":"\"info log\"","level":"info","timestamp":"6/4/2020, 15:04:01"}
+{"message":"\"warning log\"","level":"warn","timestamp":"6/4/2020, 15:04:01"}
+{"message":"\"error log\"","level":"error","timestamp":"6/4/2020, 15:04:01"}
+{"message":"\"warning log\"","level":"warn","timestamp":"6/4/2020, 15:04:02"}
+{"message":"\"info log\"","level":"info","timestamp":"6/4/2020, 15:04:02"}
+{"message":"\"error log\"","level":"error","timestamp":"6/4/2020, 15:04:02"}
+{"message":"\"warning log\"","level":"warn","timestamp":"6/4/2020, 15:04:06"}
+{"message":"\"info log\"","level":"info","timestamp":"6/4/2020, 15:04:06"}
+{"message":"\"error log\"","level":"error","timestamp":"6/4/2020, 15:04:06"}
