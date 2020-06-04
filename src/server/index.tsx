@@ -54,17 +54,21 @@ const getTodaysDate = () => {
 }
 console.log('getTodaysDate', getTodaysDate())
 
-
-let dailyLogFileName = getTodaysDate();
-while(dailyLogFileName.includes('/')) {
-  dailyLogFileName =dailyLogFileName.replace('/', '.')
+//Creating new daily or monthly log files if it is not exist
+let logFileName = getTodaysDate();
+if(process.env.LOG_DURATION === 'monthly') {
+  let index = logFileName.indexOf('/'); 
+  logFileName = logFileName.substring(index+1);
+  while(logFileName.includes('/')) {
+    logFileName =logFileName.replace('/', '.')
+  }
+} else {
+  //File name setting up
+  while(logFileName.includes('/')) {
+    logFileName =logFileName.replace('/', '.')
+  }
 }
-
-console.log('daily log file', dailyLogFileName)
-//Creating new daily log files if it is not exist
-fs.writeFile(`./log/${dailyLogFileName}.log`, '', function (err) {
-  if (err) throw err;
-});
+console.log('log file', logFileName)
 
 const { combine, timestamp, align, json } = winston.format;
 const timezoned = () => {
@@ -81,20 +85,32 @@ const logFormat = combine(
   align()
   
 )
-const logConfig = { 
-  format: logFormat,
-  transports: [
-    new winston.transports.File({
-      filename: 'combined.log',
-      level: process.env.LOG_LEVEL
-    }),
-    new winston.transports.File({
-      filename: `./log/${dailyLogFileName}.log`,
-      level: process.env.LOG_LEVEL
-    }),
-    new winston.transports.Console()
-  ] 
+let logConfigDuration = {}
+if(process.env.LOG_DURATION === 'monthly'){
+  logConfigDuration= {
+    filename: `./log/monthly/${logFileName}.log`,
+    level: process.env.LOG_LEVEL
+  }
+} else {
+  logConfigDuration= {
+    filename: `./log/daily/${logFileName}.log`,
+    level: process.env.LOG_LEVEL
+  }
 }
+
+const logConfig = { 
+    format: logFormat,
+    transports: [
+      new winston.transports.File({
+        filename: 'combined.log',
+        level: process.env.LOG_LEVEL
+      }),
+      new winston.transports.File(logConfigDuration),
+      new winston.transports.Console()
+    ] 
+  }
+
+
 const logger = winston.createLogger(logConfig)
 
 // Read file and iterate through it
