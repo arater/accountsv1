@@ -13,6 +13,7 @@ import serialize from 'serialize-javascript'
 import pkg from '../../package.json'
 import App from '../shared/App'
 import routes from '../shared/routes'
+import { create } from 'domain'
 
 const app: Application = express()
 // Config file variables 
@@ -41,7 +42,6 @@ app.use(express.static(publicPath))
 app.use(express.json())
 // winston required packages
 const winston = require('winston')
-const moment = require('moment')
 
 //Winston configs and setup
 // log level based on env variables
@@ -63,65 +63,73 @@ const getTodaysDate = () => {
 }
 console.log('getTodaysDate', getTodaysDate())
 
-//Creating new daily or monthly log files if it is not exist
-let logFileName = getTodaysDate();
-if(process.env.LOG_DURATION === 'monthly') {
-  let index = logFileName.indexOf('/'); 
-  let monthPart = logFileName.substring(0,index)
-  logFileName = monthPart + logFileName.substring(index+3);
-  while(logFileName.includes('/')) {
-    logFileName =logFileName.replace('/', '.')
+//Setup log file name
+const logFileNameArrange = () => {
+  let logFileName = getTodaysDate();
+  if(process.env.LOG_DURATION === 'monthly') {
+    let index = logFileName.indexOf('/'); 
+    let monthPart = logFileName.substring(0,index)
+    logFileName = monthPart + logFileName.substring(index+3);
+    while(logFileName.includes('/')) {
+      logFileName =logFileName.replace('/', '.')
+    }
+  } else {
+    //File name setting up
+    while(logFileName.includes('/')) {
+      logFileName =logFileName.replace('/', '.')
+    }
   }
-} else {
-  //File name setting up
-  while(logFileName.includes('/')) {
-    logFileName =logFileName.replace('/', '.')
-  }
-}
-console.log('log file', logFileName)
-
-const { combine, timestamp, align, json } = winston.format;
-const timezoned = () => {
-  return new Date().toLocaleString('en-US', {
-    timeZone: 'Europe/Moscow',
-    hour12: false
-  })
-}
-const logFormat = combine(
-  timestamp({
-    format: timezoned
-  }) ,
-  json(),
-  align()
-  
-)
-let logConfigDuration = {}
-if(process.env.LOG_DURATION === 'monthly'){
-  logConfigDuration= {
-    filename: `./log/monthly/${logFileName}.log`,
-    level: process.env.LOG_LEVEL
-  }
-} else {
-  logConfigDuration= {
-    filename: `./log/daily/${logFileName}.log`,
-    level: process.env.LOG_LEVEL
-  }
+  return logFileName
 }
 
-const logConfig = { 
+const createLogFileConfig = () => {
+  let logConfigDuration = {}
+  if(process.env.LOG_DURATION === 'monthly'){
+    logConfigDuration= {
+      filename: `./log/monthly/${logFileNameArrange()}.log`,
+      level: process.env.LOG_LEVEL
+    }
+  } else {
+    logConfigDuration= {
+      filename: `./log/daily/${logFileNameArrange()}.log`,
+      level: process.env.LOG_LEVEL
+    }
+  }
+  return logConfigDuration
+}
+
+//Winston logger cerator function
+const createLogger = () => {
+  const { combine, timestamp, align, json } = winston.format;
+  const timezoned = () => {
+    return new Date().toLocaleString('en-US', {
+      timeZone: 'Europe/Moscow',
+      hour12: false
+    })
+  }
+  const logFormat = combine(
+    timestamp({
+      format: timezoned
+    }) ,
+    json(),
+    align()
+  )
+  const logConfig = { 
     format: logFormat,
     transports: [
       new winston.transports.File({
         filename: 'combined.log',
         level: process.env.LOG_LEVEL
       }),
-      new winston.transports.File(logConfigDuration),
+      new winston.transports.File(createLogFileConfig()),
       new winston.transports.Console()
     ] 
   }
-
-
-const logger = winston.createLogger(logConfig)
+  const logger = winston.createLogger(logConfig)
+  return logger;
+}
+//Winston logger created with set configs
+createLogger()
 
 // Read file and iterate through it
 const searchLogs = function(filePath, date = getTodaysDate(), level = null, message = null) {
@@ -250,6 +258,8 @@ else{
   app.get(paths, async (req: Request, res: Response, next) => {
     if(req.query.env) {
       if(req.query.env == 'prod') {
+        createLogger()
+        //console.log('prod logConfig',logConfig)
         console.log('ENV', req.query.env);
       let envConfig = dotenv.parse(fs.readFileSync('.env.production'))
       for (const k in envConfig) {
@@ -259,6 +269,8 @@ else{
         console.log('Error',dotenv.error) 
       }
     } else if(req.query.env == 'dev') {
+      createLogger()
+      //console.log('development logConfig',logConfig)
       console.log('ENV', req.query.env);
     let envConfig = dotenv.parse(fs.readFileSync('.env'))
     for (const k in envConfig) {
@@ -321,18 +333,19 @@ else{
   app.post('/logger', (req, res) => {
     switch (req.body.type) {
       case 'log':
-        logger.log(req.body.log)
+        createLogger().log(req.body.log)
         break;
       case 'info':
-        logger.info(req.body.log)
+        createLogger().info(req.body.log)
         break;
       case 'error':
-        logger.error(req.body.log)
+        createLogger().error(req.body.log)
         break;
       case 'warn':
-          logger.warn(req.body.log)
+        createLogger().warn(req.body.log)
         break;
     }
+    return res.status(200).send();
   })
 
   app.post('/getLogs', (req, res) => {
