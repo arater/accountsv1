@@ -16,7 +16,16 @@ import routes from '../shared/routes'
 
 const app: Application = express()
 // Config file variables 
-const dotenv = require('dotenv').config()
+const dotenv = require('dotenv')
+let pathString;
+if(process.env.BUILD === 'production') {
+  pathString= '.env.production'
+}
+if(process.env.BUILD === 'development') {
+  pathString= '.env'
+}
+dotenv.config({path: pathString})
+
 const port = process.env.PORT || 8180
 const isProd = process.env.NODE_ENV === 'production'
 const publicPath = path.join(__dirname, 'public')
@@ -58,7 +67,8 @@ console.log('getTodaysDate', getTodaysDate())
 let logFileName = getTodaysDate();
 if(process.env.LOG_DURATION === 'monthly') {
   let index = logFileName.indexOf('/'); 
-  logFileName = logFileName.substring(index+1);
+  let monthPart = logFileName.substring(0,index)
+  logFileName = monthPart + logFileName.substring(index+3);
   while(logFileName.includes('/')) {
     logFileName =logFileName.replace('/', '.')
   }
@@ -238,6 +248,28 @@ if(isProd) {
 }
 else{
   app.get(paths, async (req: Request, res: Response, next) => {
+    if(req.query.env) {
+      if(req.query.env == 'prod') {
+        console.log('ENV', req.query.env);
+      let envConfig = dotenv.parse(fs.readFileSync('.env.production'))
+      for (const k in envConfig) {
+        process.env[k] = envConfig[k]
+      }
+      if (dotenv.error) {
+        console.log('Error',dotenv.error) 
+      }
+    } else if(req.query.env == 'dev') {
+      console.log('ENV', req.query.env);
+    let envConfig = dotenv.parse(fs.readFileSync('.env'))
+    for (const k in envConfig) {
+      process.env[k] = envConfig[k]
+    }
+    if (dotenv.error) {
+      console.log('Error',dotenv.error) 
+    }
+  }
+  console.log('HELLO');
+  }
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
 
     const activeRoute = routes.find(route => matchPath(req.url, route)) || {}
